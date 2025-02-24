@@ -6,7 +6,7 @@
 /*   By: dancel <dancel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:35:22 by dancel            #+#    #+#             */
-/*   Updated: 2025/02/17 17:23:41 by dancel           ###   ########.fr       */
+/*   Updated: 2025/02/24 16:52:47 by dancel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,12 @@
 #  define BUFFER_SIZE 1024
 # endif
 
+# define FORK 0
+# define EAT 1
+# define SLEEP 2
+# define THINK 3
+# define DIE 4
+
 typedef struct s_data	t_data;
 
 typedef struct s_philo
@@ -33,7 +39,8 @@ typedef struct s_philo
 	int			id;
 	int			n_meal;
 	int			n_fork;
-	int			is_alive;
+	int			fork_1;
+	int			fork_2;
 	int			is_hungry;
 	time_t		last_meal;
 	t_data		*data;
@@ -47,11 +54,12 @@ typedef struct s_data
 	int				t_e;
 	int				t_s;
 	int				n_e;
-	pthread_t		*thread;
 	t_philo			**p;
+	pthread_mutex_t	*mutex;
+//	pthread_t		*thread;
+//	pthread_t		exit;
 	int				*fork;
-//	pthread_mutex_t	**fork_mut;
-//	int				*fork_bool;
+	int				end;
 }				t_data;
 
 /*
@@ -66,12 +74,13 @@ int			init_data(int ac, char **av, t_data *data);
 # main.c
 # ============================*/
 void		exit_philo(char *s, t_data *data);
-void		log_print(int id, int action);
+void		log_print(int id, int action, t_data *data);
 int			main(int argc, char **argv);
 /*
 
 # routine.c
 # ============================*/
+//void		*checker(void *ptr);
 void		*routine(void *data);
 /*
 
