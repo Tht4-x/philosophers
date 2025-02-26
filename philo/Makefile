@@ -6,7 +6,7 @@
 #    By: dancel <dancel@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/12/12 13:49:20 by dancel            #+#    #+#              #
-#    Updated: 2025/02/24 15:57:35 by dancel           ###   ########.fr        #
+#    Updated: 2025/02/26 19:39:58 by dancel           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,7 @@
 # ============================
 PHILO            = philo
 CC               = cc
-CFLAGS           = -Wall -Werror -Wextra -g3 #-fsanitize=address
+CFLAGS           = -Wall -Werror -Wextra -g3 #-fsanitize=thread
 
 # Fichiers et bibliothèques
 # ============================

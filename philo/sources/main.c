@@ -6,7 +6,7 @@
 /*   By: dancel <dancel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 16:53:21 by dancel            #+#    #+#             */
-/*   Updated: 2025/02/24 16:56:08 by dancel           ###   ########.fr       */
+/*   Updated: 2025/02/26 20:14:54 by dancel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,26 +16,26 @@ void	exit_philo(char *s, t_data *data)
 {
 	int	i;
 
+	pthread_mutex_unlock(&data->global_mutex);
+	pthread_mutex_destroy(&data->global_mutex);
+	i = -1;
+	while (++i < data->n_p)
+	{
+		pthread_mutex_unlock(&data->mutex[i]);
+		pthread_mutex_destroy(&data->mutex[i]);
+	}
 	i = -1;
 	while (++i < data->n_p)
 	{
 		if (data->p && data->p[i] && data->p[i]->thread)
 			pthread_join(data->p[i]->thread, NULL);
-		if (data->mutex && &data->mutex[i])
-			pthread_mutex_destroy(&data->mutex[i]);
-//		if (data->p && data->p[i])
-//			free(data->p[i]);
+		if (data->p && data->p[i])
+			free(data->p[i]);
 	}
-	if (data->fork)
-		free(data->fork);
 	if (data->p)
 		free(data->p);
-	if (data->mutex && &data->mutex[data->n_p])
-		pthread_mutex_destroy(&data->mutex[data->n_p]);
 	if (data->mutex)
 		free(data->mutex);
-//	if (data->thread) //a verifier
-//		free(data->thread);
 	free(data);
 	write(2, s, ft_strlen(s));
 }
@@ -43,57 +43,48 @@ void	exit_philo(char *s, t_data *data)
 void	log_print(int id, int action, t_data *data)
 {
 	int		time;
-	char	*s;
 
-	pthread_mutex_lock(&data->mutex[data->n_p]);
+	pthread_mutex_lock(&data->global_mutex);
 	if (data->end)
+	{
+		pthread_mutex_unlock(&data->global_mutex);
 		return ;
+	}
 	time = (int)get_time() - data->start_time;
 	if (action == FORK)
-		s = "\033[34;1mhas taken a fork\033[0m";
+		printf(M_FORK, time, id + 1);
 	if (action == EAT)
-	{
-		printf("%d \033[35;1m%d\033[0m \033[34;1mhas taken a fork\033[0m\n"\
-			, time, id);
-		s = "\033[32;1mis eating\033[0m";
-	}
+		printf(M_FORK M_EAT, time, id + 1, time, id + 1);
 	if (action == SLEEP)
-		s = "\033[33;1mis sleeping\033[0m";
+		printf(M_SLEEP, time, id + 1);
 	if (action == THINK)
-		s = "\033[36;1mis thinking\033[0m";
+		printf(M_THINK, time, id + 1);
 	if (action == DIE)
-		s = "\033[31;1mdied\033[0m";
-	printf("%d \033[35;1m%d\033[0m %s\n", time, id, s);
-	pthread_mutex_unlock(&data->mutex[data->n_p]);
+		printf(M_DIE, time, id + 1);
+	pthread_mutex_unlock(&data->global_mutex);
 }
 
 int	main(int ac, char **av)
 {
 	t_data		*data;
-//	pthread_t	exit;
 
 	data = malloc(sizeof(t_data));
 	if (!data)
 		return (write(2, "Error : malloc failed\n", 22), 1);
-	if (!init_data(ac, av, data))
+	if (!parsing(ac, av, data))
+		return (free(data), write(2, "Error : invalid input\n", 22), 0);
+	if (data->n_e == 0 || data->n_p == 0)
+		return (free(data), 0);
+	if (!init_data(-1, data))
 		return (1);
-//	exit = data->exit;
 	while (!data->end)
-		usleep(100);
+		check_if_finish(data);
 	exit_philo("", data);
-//	pthread_join(exit, NULL);
 	return (0);
 }
 
 /*
-mettre les mutex dans les philos avec adresse du 2e mutex ?
-	->echanger gauche et droite
-faire les threads dans les philo
-s'arrete un moment sans ne plus rien afficher
-plusieurs messages s'affichent en meme temps comme 2x died
-
-Si deux philosophes veulent la meme fourchette, priorite au plus petit ?
-philo impairs commencent par reflechir
+--tool=helgrind
 
 TEST
 Test 1 800 200 200. The philosopher should not eat and should die.

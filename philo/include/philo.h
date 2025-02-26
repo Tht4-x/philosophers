@@ -6,7 +6,7 @@
 /*   By: dancel <dancel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:35:22 by dancel            #+#    #+#             */
-/*   Updated: 2025/02/24 16:52:47 by dancel           ###   ########.fr       */
+/*   Updated: 2025/02/26 20:14:23 by dancel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,44 +21,42 @@
 # include <pthread.h>
 # include <limits.h>
 
-# ifndef BUFFER_SIZE
-#  define BUFFER_SIZE 1024
-# endif
-
 # define FORK 0
 # define EAT 1
 # define SLEEP 2
 # define THINK 3
 # define DIE 4
 
+# define M_FORK "%d \033[35;1m%d\033[0m \033[34;1mhas taken a fork\033[0m\n"
+# define M_EAT "%d \033[35;1m%d\033[0m \033[32;1mis eating\033[0m\n"
+# define M_SLEEP "%d \033[35;1m%d\033[0m \033[33;1mis sleeping\033[0m\n"
+# define M_THINK "%d \033[35;1m%d\033[0m \033[36;1mis thinking\033[0m\n"
+# define M_DIE "%d \033[35;1m%d\033[0m \033[31;1mdied\033[0m\n"
+
 typedef struct s_data	t_data;
 
 typedef struct s_philo
 {
-	pthread_t	thread;
-	int			id;
-	int			n_meal;
-	int			n_fork;
-	int			fork_1;
-	int			fork_2;
-	int			is_hungry;
-	time_t		last_meal;
-	t_data		*data;
+	pthread_t		thread;
+	int				id;
+	int				n_meal;
+	pthread_mutex_t	*fork_1;
+	pthread_mutex_t	*fork_2;
+	time_t			last_meal;
+	t_data			*data;
 }				t_philo;
 
 typedef struct s_data
 {
 	time_t			start_time;
 	int				n_p;
-	int				t_d;
-	int				t_e;
-	int				t_s;
+	time_t			t_d;
+	time_t			t_e;
+	time_t			t_s;
 	int				n_e;
 	t_philo			**p;
 	pthread_mutex_t	*mutex;
-//	pthread_t		*thread;
-//	pthread_t		exit;
-	int				*fork;
+	pthread_mutex_t	global_mutex;
 	int				end;
 }				t_data;
 
@@ -68,7 +66,7 @@ typedef struct s_data
 # ============================*/
 int			create_philo(int i, t_data *data);
 int			parsing(int ac, char **av, t_data *data);
-int			init_data(int ac, char **av, t_data *data);
+int			init_data(int i, t_data *data);
 /*
 
 # main.c
@@ -80,7 +78,7 @@ int			main(int argc, char **argv);
 
 # routine.c
 # ============================*/
-//void		*checker(void *ptr);
+void		check_if_finish(t_data *data);
 void		*routine(void *data);
 /*
 

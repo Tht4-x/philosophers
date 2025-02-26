@@ -6,7 +6,7 @@
 /*   By: dancel <dancel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 17:57:14 by dancel            #+#    #+#             */
-/*   Updated: 2025/02/24 12:59:36 by dancel           ###   ########.fr       */
+/*   Updated: 2025/02/26 19:45:20 by dancel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,13 +67,5 @@ time_t	get_time(void)
 	struct timeval	tv;
 
 	gettimeofday(&tv, NULL);
-	return (tv.tv_sec + tv.tv_usec / 1000);
-}
-
-void	ft_debug(void)
-{
-	int	*ptr;
-
-	ptr = 0;
-	*ptr = 42;
+	return (tv.tv_sec * 1000 + tv.tv_usec / 1000);
 }
