@@ -6,7 +6,7 @@
 /*   By: dancel <dancel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 16:53:21 by dancel            #+#    #+#             */
-/*   Updated: 2025/02/26 20:14:54 by dancel           ###   ########.fr       */
+/*   Updated: 2025/02/26 22:00:59 by dancel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,61 @@ void	log_print(int id, int action, t_data *data)
 	pthread_mutex_unlock(&data->global_mutex);
 }
 
+static void	check_if_finish(t_data *data)
+{
+	int	i;
+
+	i = -1;
+	while (data->p[++i])
+	{
+		if (get_time() - data->p[i]->last_meal >= data->t_d)
+		{
+			log_print(i, DIE, data);
+			pthread_mutex_lock(&data->global_mutex);
+			data->end = 1;
+			pthread_mutex_unlock(&data->global_mutex);
+			return ;
+		}
+	}
+	i = -1;
+	while (data->p[++i])
+	{
+		if (data->p[i]->n_meal < data->n_e)
+			return ;
+	}
+	pthread_mutex_lock(&data->global_mutex);
+	data->end = 2;
+	pthread_mutex_unlock(&data->global_mutex);
+}
+
+static int	parsing(int ac, char **av, t_data *data)
+{
+	int			i;
+	long long	temp;
+
+	i = 0;
+	while (av[++i])
+	{
+		if (!ft_strisdigit(av[i]))
+			return (0);
+		temp = ft_atoll(av[i]);
+		if (temp > INT_MAX || temp < 0)
+			return (0);
+		if (i == 1)
+			data->n_p = temp;
+		if (i == 2)
+			data->t_d = temp;
+		if (i == 3)
+			data->t_e = temp;
+		if (i == 4)
+			data->t_s = temp;
+		data->n_e = INT_MAX;
+		if (i == 5)
+			data->n_e = temp;
+	}
+	return (ac == 5 || ac == 6);
+}
+
 int	main(int ac, char **av)
 {
 	t_data		*data;
@@ -84,11 +139,15 @@ int	main(int ac, char **av)
 }
 
 /*
---tool=helgrind
+meurs si impair
+	ceux qui mangent doivent alterner
+	ne prend pas premiere fourchette si la 2e est deja prise
+	ou prends les 2 fourchettes d'un coup
+	ou repose fourchette 
 
 TEST
 Test 1 800 200 200. The philosopher should not eat and should die.
-Test 5 800 200 200. No philosopher should die.
+Test 5 800 200 200. No philosopher should die. 
 Test 5 800 200 200 7. No die and win.
 Test 4 410 200 200. No philosopher should die.
 Test 4 310 200 100. One philosopher should die

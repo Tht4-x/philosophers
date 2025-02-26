@@ -6,7 +6,7 @@
 /*   By: dancel <dancel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:35:22 by dancel            #+#    #+#             */
-/*   Updated: 2025/02/26 20:14:23 by dancel           ###   ########.fr       */
+/*   Updated: 2025/02/26 21:14:54 by dancel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,8 +64,8 @@ typedef struct s_data
 
 # initialisation.c
 # ============================*/
-int			create_philo(int i, t_data *data);
-int			parsing(int ac, char **av, t_data *data);
+//int			create_philo(int i, t_data *data);
+//int			parsing(int ac, char **av, t_data *data);
 int			init_data(int i, t_data *data);
 /*
 
@@ -78,7 +78,7 @@ int			main(int argc, char **argv);
 
 # routine.c
 # ============================*/
-void		check_if_finish(t_data *data);
+//void		check_if_finish(t_data *data);
 void		*routine(void *data);
 /*
 
@@ -88,6 +88,5 @@ size_t		ft_strlen(const char *s);
 int			ft_strisdigit(const char *nb);
 long long	ft_atoll(const char *nptr);
 time_t		get_time(void);
-void		ft_debug(void);
 
 #endif
