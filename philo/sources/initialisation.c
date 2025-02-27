@@ -6,7 +6,7 @@
 /*   By: dancel <dancel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 17:16:10 by dancel            #+#    #+#             */
-/*   Updated: 2025/02/26 21:36:38 by dancel           ###   ########.fr       */
+/*   Updated: 2025/02/27 23:08:32 by dancel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,13 +46,41 @@ int	init_data(int i, t_data *data)
 		if (pthread_mutex_init(&data->mutex[i], NULL))
 			return (exit_philo("Error : pthread_mutex_init failed\n", data), 0);
 	}
+	if (pthread_mutex_init(&data->global_mutex, NULL))
+		return (exit_philo("Error : pthread_mutex_init failed\n", data), 0);
 	i = -1;
 	while (++i < data->n_p)
 	{
 		if (!create_philo(i, data))
 			return (0);
 	}
-	if (pthread_mutex_init(&data->global_mutex, NULL))
-		return (exit_philo("Error : pthread_mutex_init failed\n", data), 0);
 	return (1);
+}
+
+int	parsing(int ac, char **av, t_data *data)
+{
+	int			i;
+	long long	temp;
+
+	i = 0;
+	while (av[++i])
+	{
+		if (!ft_strisdigit(av[i]))
+			return (0);
+		temp = ft_atoll(av[i]);
+		if (temp > INT_MAX || temp < 0)
+			return (0);
+		if (i == 1)
+			data->n_p = temp;
+		if (i == 2)
+			data->t_d = temp;
+		if (i == 3)
+			data->t_e = temp;
+		if (i == 4)
+			data->t_s = temp;
+		data->n_e = INT_MAX;
+		if (i == 5)
+			data->n_e = temp;
+	}
+	return (ac == 5 || ac == 6);
 }

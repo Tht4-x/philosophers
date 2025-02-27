@@ -6,7 +6,7 @@
 /*   By: dancel <dancel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/15 16:53:21 by dancel            #+#    #+#             */
-/*   Updated: 2025/02/26 22:00:59 by dancel           ###   ########.fr       */
+/*   Updated: 2025/02/27 23:08:13 by dancel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,12 +44,9 @@ void	log_print(int id, int action, t_data *data)
 {
 	int		time;
 
-	pthread_mutex_lock(&data->global_mutex);
-	if (data->end)
-	{
-		pthread_mutex_unlock(&data->global_mutex);
+	if (check_end(data))
 		return ;
-	}
+	pthread_mutex_lock(&data->global_mutex);
 	time = (int)get_time() - data->start_time;
 	if (action == FORK)
 		printf(M_FORK, time, id + 1);
@@ -64,7 +61,7 @@ void	log_print(int id, int action, t_data *data)
 	pthread_mutex_unlock(&data->global_mutex);
 }
 
-static void	check_if_finish(t_data *data)
+int	check_if_finish(t_data *data)
 {
 	int	i;
 
@@ -77,46 +74,19 @@ static void	check_if_finish(t_data *data)
 			pthread_mutex_lock(&data->global_mutex);
 			data->end = 1;
 			pthread_mutex_unlock(&data->global_mutex);
-			return ;
+			return (1);
 		}
 	}
 	i = -1;
 	while (data->p[++i])
 	{
 		if (data->p[i]->n_meal < data->n_e)
-			return ;
+			return (0);
 	}
 	pthread_mutex_lock(&data->global_mutex);
 	data->end = 2;
 	pthread_mutex_unlock(&data->global_mutex);
-}
-
-static int	parsing(int ac, char **av, t_data *data)
-{
-	int			i;
-	long long	temp;
-
-	i = 0;
-	while (av[++i])
-	{
-		if (!ft_strisdigit(av[i]))
-			return (0);
-		temp = ft_atoll(av[i]);
-		if (temp > INT_MAX || temp < 0)
-			return (0);
-		if (i == 1)
-			data->n_p = temp;
-		if (i == 2)
-			data->t_d = temp;
-		if (i == 3)
-			data->t_e = temp;
-		if (i == 4)
-			data->t_s = temp;
-		data->n_e = INT_MAX;
-		if (i == 5)
-			data->n_e = temp;
-	}
-	return (ac == 5 || ac == 6);
+	return (1);
 }
 
 int	main(int ac, char **av)
@@ -132,26 +102,13 @@ int	main(int ac, char **av)
 		return (free(data), 0);
 	if (!init_data(-1, data))
 		return (1);
-	while (!data->end)
-		check_if_finish(data);
+	while (!check_if_finish(data))
+		usleep(100);
 	exit_philo("", data);
 	return (0);
 }
 
 /*
-meurs si impair
-	ceux qui mangent doivent alterner
-	ne prend pas premiere fourchette si la 2e est deja prise
-	ou prends les 2 fourchettes d'un coup
-	ou repose fourchette 
-
-TEST
-Test 1 800 200 200. The philosopher should not eat and should die.
-Test 5 800 200 200. No philosopher should die. 
-Test 5 800 200 200 7. No die and win.
-Test 4 410 200 200. No philosopher should die.
-Test 4 310 200 100. One philosopher should die
-
 ARG
 	number_of_philosophers
 	time_to_die

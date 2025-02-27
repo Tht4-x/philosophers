@@ -6,7 +6,7 @@
 /*   By: dancel <dancel@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/03 13:35:22 by dancel            #+#    #+#             */
-/*   Updated: 2025/02/26 21:14:54 by dancel           ###   ########.fr       */
+/*   Updated: 2025/02/27 23:09:35 by dancel           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 # define SLEEP 2
 # define THINK 3
 # define DIE 4
+# define PHILOSOPHIZE INT_MAX
 
 # define M_FORK "%d \033[35;1m%d\033[0m \033[34;1mhas taken a fork\033[0m\n"
 # define M_EAT "%d \033[35;1m%d\033[0m \033[32;1mis eating\033[0m\n"
@@ -64,8 +65,7 @@ typedef struct s_data
 
 # initialisation.c
 # ============================*/
-//int			create_philo(int i, t_data *data);
-//int			parsing(int ac, char **av, t_data *data);
+int			parsing(int ac, char **av, t_data *data);
 int			init_data(int i, t_data *data);
 /*
 
@@ -73,12 +73,13 @@ int			init_data(int i, t_data *data);
 # ============================*/
 void		exit_philo(char *s, t_data *data);
 void		log_print(int id, int action, t_data *data);
+int			check_if_finish(t_data *data);
 int			main(int argc, char **argv);
 /*
 
 # routine.c
 # ============================*/
-//void		check_if_finish(t_data *data);
+int			check_end(t_data *data);
 void		*routine(void *data);
 /*
 
